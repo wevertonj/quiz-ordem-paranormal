@@ -80,18 +80,244 @@ Chart.register(...registerables);
         </div>
       </div>
       
-      <div class="result__actions animate-fade-in-up delay-500">
-        <button class="btn btn--primary btn--lg" (click)="restart.emit()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="1 4 1 10 7 10"></polyline>
-            <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
-          </svg>
-          <span>Refazer Quiz</span>
-        </button>
-      </div>
+      <div class="customizer animate-fade-in-up delay-500">
+  <h3 class="customizer__title">Refinar Identidade do Agente</h3>
+  
+  <div class="customizer__base-grid">
+    <div class="field-group">
+      <label>Gênero</label>
+      <select [value]="genero()" (change)="updateField($event, genero)">
+        @for (opt of GENDER_OPTS; track opt) { <option [value]="opt">{{opt}}</option> }
+      </select>
     </div>
+    <div class="field-group">
+      <label>Etnia/Pele</label>
+      <select [value]="etnia()" (change)="updateField($event, etnia)">
+        @for (opt of SKIN_OPTS; track opt) { <option [value]="opt">{{opt}}</option> }
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Idade</label>
+      <select [value]="idade()" (change)="updateField($event, idade)">
+        @for (opt of AGE_OPTS; track opt) { <option [value]="opt">{{opt}}</option> }
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Altura</label>
+      <select [value]="altura()" (change)="updateField($event, altura)">
+        @for (opt of HEIGHT_OPTS; track opt) { <option [value]="opt">{{opt}}</option> }
+      </select>
+    </div>
+    <div class="field-group">
+      <label>Porte Físico</label>
+      <select [value]="porte()" (change)="updateField($event, porte)">
+        @for (opt of BODY_OPTS; track opt) { <option [value]="opt">{{opt}}</option> }
+      </select>
+    </div>
+  </div>
+
+  <h3 class="customizer__title" style="margin-top: 1.5rem;">Acessórios e Marcas</h3>
+<div class="customizer__scroll-area">
+    @for (cat of VISUAL_CATEGORIES; track cat.nome) {
+      <div class="category-section">
+        <h4 class="category-name">{{ cat.nome }}</h4>
+        <div class="customizer__grid">
+          @for (opt of cat.itens; track opt.label) {
+            <div class="visual-card" 
+                 [class.selected]="visualChoices().includes(opt.label)"
+                 (click)="toggleChoice(opt.label)">
+              <span class="visual-card__icon">{{ opt.icon }}</span>
+              <span class="visual-card__label">{{ opt.label }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="prompt-output">
+    <div class="prompt-header">
+      <h4>Prompt para o Gemini:</h4>
+      <button (click)="copyPrompt()" class="btn-copy">Copiar</button>
+    </div>
+    <code>
+      Agente: {{genero()}}, {{idade()}}, {{etnia()}}, {{altura()}}, corpo {{porte()}}. 
+      Classe: {{ result().classe.nome }} ({{ result().trilha.nome }}). 
+      Detalhes: {{ visualChoices().join(', ') || 'Visual padrão' }}.
+    </code>
+  </div>
+</div>
   `,
   styles: [`
+
+    /* Corrige o fundo branco das opções do select no Windows/Chrome */
+    .field-group select {
+      background: #1a1a1a; /* Fundo escuro fixo */
+      border: 1px solid var(--border-color);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      appearance: none; /* Remove seta padrão em alguns browsers */
+    }
+
+    /* Garante que as opções (dropdown) também fiquem escuras */
+    .field-group select option {
+      background-color: #1a1a1a;
+      color: white;
+    }
+
+    .prompt-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    /* Botão Copiar Estilizado */
+    .btn-copy {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+
+    .btn-copy:hover {
+      filter: brightness(1.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-copy:active {
+      transform: translateY(0);
+    }
+
+    /* Estilo para quando o botão for clicado (Feedback visual) */
+    .btn-copy.copied {
+      background: #28a745; /* Verde */
+    }
+
+    .customizer {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .customizer__title {
+      font-size: 1.25rem;
+      color: var(--accent-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .customizer__base-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 1rem;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-group label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .field-group select {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .customizer__scroll-area {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+      margin: 1.5rem 0;
+    }
+
+    /* Estilo da barra de scroll */
+    .customizer__scroll-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .customizer__scroll-area::-webkit-scrollbar-thumb {
+      background: var(--accent-primary);
+      border-radius: 10px;
+    }
+
+    .category-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .category-name {
+      font-size: 0.8rem;
+      color: var(--accent-secondary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-left: 3px solid var(--accent-secondary);
+      padding-left: 10px;
+      margin-bottom: 10px;
+    }
+
+    .customizer__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 8px;
+    }
+
+    .visual-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .visual-card:hover {
+      border-color: var(--accent-primary);
+      background: rgba(98, 0, 238, 0.05);
+    }
+
+    .visual-card.selected {
+      border-color: var(--accent-primary);
+      background: rgba(98, 0, 238, 0.15);
+      transform: scale(1.05);
+    }
+
+    .visual-card__icon { font-size: 1.5rem; margin-bottom: 5px; }
+    .visual-card__label { font-size: 0.75rem; text-align: center; color: var(--text-secondary); }
+
+    .prompt-output {
+      background: #000;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--accent-primary);
+      margin-top: 1rem;
+    }
+
+    .prompt-output h4 { font-size: 0.8rem; color: var(--accent-primary); margin-bottom: 5px; }
+    .prompt-output code { color: #0f0; font-family: monospace; font-size: 0.9rem; }
+
     .result {
       padding: 1.5rem 1rem 3rem;
       max-width: 1200px;
@@ -301,7 +527,102 @@ Chart.register(...registerables);
 export class QuizResultComponent {
   result = input.required<QuizResult>();
   restart = output<void>();
+  copied = signal(false);
+  visualChoices = signal<string[]>([]);
 
+  genero = signal<string>('masculino');
+  etnia = signal<string>('branco');
+  altura = signal<string>('Média');
+  porte = signal<string>('Atlético');
+  idade = signal<string>('Adulto');
+
+readonly GENDER_OPTS = ['Masculino', 'Feminino', 'Andrógino', 'Não-binário'];
+  readonly SKIN_OPTS = ['Pele Branca', 'Pele Negra', 'Pele Parda', 'Pele Asiática', 'Pele Retinta', 'Pele Pálida'];
+  readonly HEIGHT_OPTS = ['Muito Baixo(a)', 'Baixo(a)', 'Altura Média', 'Alto(a)', 'Muito Alto(a)'];
+  readonly BODY_OPTS = ['Ectomorfo (Magro)', 'Atlético', 'Musculoso', 'Endomorfo (Robusto)', 'Esguio'];
+  readonly AGE_OPTS = ['Adolescente', 'Jovem Adulto', 'Adulto', 'Meia-idade', 'Idoso'];  
+  
+  updateField(event: Event, sig: any) {
+    sig.set((event.target as HTMLSelectElement).value);
+  }
+
+  // Opções para o usuário clicar
+// Categorias de acessórios para facilitar a expansão
+  readonly VISUAL_CATEGORIES = [
+    {
+      nome: 'Marcas e Cicatrizes',
+      itens: [
+        { label: 'Cicatrizes de Batalha', icon: '⚔️' },
+        { label: 'Bandagens', icon: '🩹' },
+        { label: 'Queimaduras', icon: '🔥' },
+        { label: 'Tatuagens Ocultas', icon: '🖋️' },
+        { label: 'Olheiras Profundas', icon: '👁️' }
+      ]
+    },
+    {
+      nome: 'Equipamentos',
+      itens: [
+        { label: 'Faca Curta', icon: '🔪' },
+        { label: 'Lanterna Tática', icon: '🔦' },
+        { label: 'Coldre de Couro', icon: '🔫' },
+        { label: 'Bolsa de Suprimentos', icon: '👜' },
+        { label: 'Rádio/Comunicador', icon: '📻' }
+      ]
+    },
+    {
+      nome: 'Vestimentas',
+      itens: [
+        { label: 'Sobretudo Gasto', icon: '🧥' },
+        { label: 'Roupas Rasgadas', icon: '👕' },
+        { label: 'Capuz Escuro', icon: '👤' },
+        { label: 'Luvas de Couro', icon: '🧤' },
+        { label: 'Botas Militares', icon: '🥾' }
+      ]
+    },
+    {
+      nome: 'Paranormal (Medo)',
+      itens: [
+        { label: 'Símbolos Amaldiçoados', icon: '✡️' },
+        { label: 'Olhos enegrecidos', icon: '🌑' },
+        { label: 'Aura de Energia', icon: '⚡' },
+        { label: 'Manchas de Lodo', icon: '🍄' },
+        { label: 'Correntes', icon: '⛓️' }
+      ]
+    }
+  ];
+
+toggleChoice(tag: string) {
+  const current = this.visualChoices();
+  this.visualChoices.set(
+    current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
+  );
+}
+
+copyPrompt() {
+  const res = this.result();
+  
+  const promptOficial = `
+Use as imagens enviadas exclusivamente como referência de estilo artístico e traço visual.
+Crie um personagem de RPG totalmente original seguindo fielmente o estilo das imagens de referência.
+
+DADOS DO PERSONAGEM:
+- Classe: ${res.classe.nome} (${res.trilha.nome})
+- Origem: ${res.origem.nome}
+- Gênero/Aparência: ${this.genero()}
+- Etnia: ${this.etnia()}
+- Idade aparente: ${this.idade()}
+- Físico: ${this.altura()}, porte ${this.porte()}
+- Detalhes Visuais: ${this.visualChoices().join(', ') || 'Sem acessórios extras'}
+- Descrição da Classe: ${res.classe.descricao}
+
+Estilo final: concept art de RPG, estilo Ordem Paranormal, dark fantasy, pintura digital, paleta de cores cinematográfica e sombria, alta resolução, sem texto ou assinaturas.
+  `.trim();
+
+  navigator.clipboard.writeText(promptOficial).then(() => {
+    this.copied.set(true);
+    setTimeout(() => this.copied.set(false), 2000);
+  });
+}
   radarChart = viewChild<ElementRef<HTMLCanvasElement>>('radarChart');
   barChart = viewChild<ElementRef<HTMLCanvasElement>>('barChart');
   doughnutChart = viewChild<ElementRef<HTMLCanvasElement>>('doughnutChart');

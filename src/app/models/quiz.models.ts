@@ -1,68 +1,19 @@
-export interface QuizQuestion {
-  id: number;
-  question: string;
-  options: QuizOption[];
-  category: 'classe' | 'trilha' | 'origem' | 'personalidade';
-}
-
 export interface QuizOption {
   text: string;
   scores: {
     combatente?: number;
     especialista?: number;
     ocultista?: number;
-    // Trilhas Combatente
-    agenteSecreto?: number;
-    aniquilador?: number;
-    cacador?: number;
-    comandanteDeCampo?: number;
-    guerreiro?: number;
-    monstruoso?: number;
-    operacoesEspeciais?: number;
-    tropaDeChoque?: number;
-    // Trilhas Especialista
-    atiradorDeElite?: number;
-    bibliotecario?: number;
-    infiltrador?: number;
-    medicoDeCampo?: number;
-    muambeiro?: number;
-    negociador?: number;
-    perseverante?: number;
-    tecnico?: number;
-    // Trilhas Ocultista
-    conduite?: number;
-    exorcista?: number;
-    flagelador?: number;
-    graduado?: number;
-    intuitivo?: number;
-    laminaParanormal?: number;
-    parapsicologo?: number;
-    possuido?: number;
-    // Origens
-    academico?: number;
-    agenteDeSaude?: number;
-    amnesico?: number;
-    artista?: number;
-    atleta?: number;
-    colegial?: number;
-    criminoso?: number;
-    cultistaArrependido?: number;
-    desgarrado?: number;
-    engenheiro?: number;
-    executivo?: number;
-    investigador?: number;
-    lutador?: number;
-    militar?: number;
-    operario?: number;
-    policial?: number;
-    religioso?: number;
-    teoricoConspiracao?: number;
-    ti?: number;
-    trabalhadorRural?: number;
-    trambiqueiro?: number;
-    universitario?: number;
-    vitima?: number;
+    [key: string]: number | undefined; 
   };
+  tags?: string[];
+}
+
+export interface QuizQuestion {
+  id: number;
+  question: string;
+  options: QuizOption[];
+  category: 'classe' | 'trilha' | 'origem' | 'personalidade';
 }
 
 export interface QuizResult {
@@ -82,13 +33,19 @@ export interface QuizResult {
     pontuacao: number;
     descricao: string;
   };
+  visual: {
+    tags: string[];
+    descricao: string;
+    promptGemini: string;
+    topTags: Array<{ tag: string; texto: string; ocorrencias: number }>;
+  };
   distribuicaoClasses: {
     combatente: number;
     especialista: number;
     ocultista: number;
   };
-  topTrilhas: Array<{ nome: string; pontuacao: number; }>;
-  topOrigens: Array<{ nome: string; pontuacao: number; }>;
+  topTrilhas: Array<{ nome: string; pontuacao: number }>;
+  topOrigens: Array<{ nome: string; pontuacao: number }>;
 }
 
 export interface ClasseInfo {
@@ -111,4 +68,12 @@ export interface OrigemInfo {
   nome: string;
   descricao: string;
   perfil: string;
+}
+
+export interface VisualOption {
+  id: string;
+  label: string;
+  category: 'corpo' | 'pele' | 'acessorios' | 'marcas';
+  tag: string;
+  icon?: string; 
 }
