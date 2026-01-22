@@ -59,3 +59,9 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## License
+
+This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
+
+The BSD 3-Clause License is a permissive open-source license that allows you to freely use, modify, and distribute this software, provided that you include the original copyright notice and disclaimer.
