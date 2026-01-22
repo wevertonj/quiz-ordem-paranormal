@@ -536,18 +536,18 @@ export class QuizResultComponent {
   porte = signal<string>('Atlético');
   idade = signal<string>('Adulto');
 
-readonly GENDER_OPTS = ['Masculino', 'Feminino', 'Andrógino', 'Não-binário'];
+  readonly GENDER_OPTS = ['Masculino', 'Feminino', 'Andrógino', 'Não-binário'];
   readonly SKIN_OPTS = ['Pele Branca', 'Pele Negra', 'Pele Parda', 'Pele Asiática', 'Pele Retinta', 'Pele Pálida'];
   readonly HEIGHT_OPTS = ['Muito Baixo(a)', 'Baixo(a)', 'Altura Média', 'Alto(a)', 'Muito Alto(a)'];
   readonly BODY_OPTS = ['Ectomorfo (Magro)', 'Atlético', 'Musculoso', 'Endomorfo (Robusto)', 'Esguio'];
-  readonly AGE_OPTS = ['Adolescente', 'Jovem Adulto', 'Adulto', 'Meia-idade', 'Idoso'];  
-  
+  readonly AGE_OPTS = ['Adolescente', 'Jovem Adulto', 'Adulto', 'Meia-idade', 'Idoso'];
+
   updateField(event: Event, sig: any) {
     sig.set((event.target as HTMLSelectElement).value);
   }
 
   // Opções para o usuário clicar
-// Categorias de acessórios para facilitar a expansão
+  // Categorias de acessórios para facilitar a expansão
   readonly VISUAL_CATEGORIES = [
     {
       nome: 'Marcas e Cicatrizes',
@@ -591,19 +591,18 @@ readonly GENDER_OPTS = ['Masculino', 'Feminino', 'Andrógino', 'Não-binário'];
     }
   ];
 
-toggleChoice(tag: string) {
-  const current = this.visualChoices();
-  this.visualChoices.set(
-    current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
-  );
-}
+  toggleChoice(tag: string) {
+    const current = this.visualChoices();
+    this.visualChoices.set(
+      current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
+    );
+  }
 
-copyPrompt() {
-  const res = this.result();
-  
-  const promptOficial = `
-Use as imagens enviadas exclusivamente como referência de estilo artístico e traço visual.
-Crie um personagem de RPG totalmente original seguindo fielmente o estilo das imagens de referência.
+  copyPrompt() {
+    const res = this.result();
+
+    const promptOficial = `
+Crie uma ilustração de personagem de RPG com estilo semi-realista, proporções reais, sombreamento suave e acabamento de concept art.
 
 DADOS DO PERSONAGEM:
 - Classe: ${res.classe.nome} (${res.trilha.nome})
@@ -618,11 +617,11 @@ DADOS DO PERSONAGEM:
 Estilo final: concept art de RPG, estilo Ordem Paranormal, dark fantasy, pintura digital, paleta de cores cinematográfica e sombria, alta resolução, sem texto ou assinaturas.
   `.trim();
 
-  navigator.clipboard.writeText(promptOficial).then(() => {
-    this.copied.set(true);
-    setTimeout(() => this.copied.set(false), 2000);
-  });
-}
+    navigator.clipboard.writeText(promptOficial).then(() => {
+      this.copied.set(true);
+      setTimeout(() => this.copied.set(false), 2000);
+    });
+  }
   radarChart = viewChild<ElementRef<HTMLCanvasElement>>('radarChart');
   barChart = viewChild<ElementRef<HTMLCanvasElement>>('barChart');
   doughnutChart = viewChild<ElementRef<HTMLCanvasElement>>('doughnutChart');

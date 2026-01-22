@@ -39,7 +39,7 @@ export class QuizService {
 
   calculateResults(): QuizResult {
     const scores: Record<string, number> = {};
-    
+
     // 1. Somar pontuações
     this.answers().forEach((option: QuizOption) => {
       if (option.scores) {
@@ -79,7 +79,7 @@ export class QuizService {
 
     // 5. Lógica de Tags
     const allSelectedTags: string[] = [];
-    this.answers().forEach(opt => { if(opt.tags) allSelectedTags.push(...opt.tags); });
+    this.answers().forEach(opt => { if (opt.tags) allSelectedTags.push(...opt.tags); });
 
     // Função única para buscar no visual-tags ou retornar valor padrão
     const getVal = (prefix: string, defaultVal: string) => {
@@ -91,10 +91,7 @@ export class QuizService {
 
     // 6. Construção do Prompt Único e Organizado
     const promptGemini = `
-Use as imagens enviadas exclusivamente como referência de estilo artístico e traço visual.
-Crie um personagem de RPG totalmente original, mantendo com extrema fidelidade o mesmo estilo de ilustração das referências.
-
-Preserve exatamente: traço semi-realista, proporções reais, sombreamento suave, paleta desaturada e acabamento de concept art.
+Crie uma ilustração de personagem de RPG com estilo semi-realista, proporções reais, sombreamento suave, paleta desaturada e acabamento de concept art.
 
 Características do personagem:
 - Raça: ${getVal('raca_', 'Humana')}
@@ -116,11 +113,11 @@ Estilo final: ilustração de personagem de RPG, dark/low fantasy, concept art d
       classe: { nome: classeInfo?.nome || topClasse[0], pontuacao: topClasse[1], descricao: classeInfo?.descricao || '', icone: classeInfo?.icone || '❓' },
       trilha: { nome: topTrilha.nome, pontuacao: topTrilha.pontuacao, descricao: TRILHAS_INFO[topTrilha.key]?.descricao || '' },
       origem: { nome: topOrigem.nome, pontuacao: topOrigem.pontuacao, descricao: ORIGENS_INFO[topOrigem.key]?.descricao || '' },
-      visual: { 
-        tags: allSelectedTags, 
+      visual: {
+        tags: allSelectedTags,
         descricao: getVal('per_', 'Visual paranormal'), // Usa personalidade como descrição curta
-        promptGemini, 
-        topTags: [] 
+        promptGemini,
+        topTags: []
       },
       distribuicaoClasses,
       topTrilhas: trilhaScores.slice(0, 5).map(t => ({ nome: t.nome, pontuacao: t.pontuacao })),
