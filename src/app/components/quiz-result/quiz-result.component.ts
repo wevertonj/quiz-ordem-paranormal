@@ -140,11 +140,7 @@ Chart.register(...registerables);
       <h4>Prompt para o Gemini:</h4>
       <button (click)="copyPrompt()" class="btn-copy">Copiar</button>
     </div>
-    <code>
-      Agente: {{genero()}}, {{idade()}}, {{etnia()}}, {{altura()}}, corpo {{porte()}}. 
-      Classe: {{ result().classe.nome }} ({{ result().trilha.nome }}). 
-      Detalhes: {{ visualChoices().join(', ') || 'Visual padrão' }}.
-    </code>
+    <pre><code>{{ getPromptPreview() }}</code></pre>
   </div>
 </div>
   `,
@@ -248,7 +244,7 @@ Chart.register(...registerables);
     .customizer__scroll-area {
       max-height: 400px;
       overflow-y: auto;
-      padding-right: 10px;
+      padding: 0 10px 0 5px;
       margin: 1.5rem 0;
     }
 
@@ -316,7 +312,8 @@ Chart.register(...registerables);
     }
 
     .prompt-output h4 { font-size: 0.8rem; color: var(--accent-primary); margin-bottom: 5px; }
-    .prompt-output code { color: #0f0; font-family: monospace; font-size: 0.9rem; }
+    .prompt-output pre { margin: 0; white-space: pre-wrap; word-wrap: break-word; }
+    .prompt-output code { color: #0f0; font-family: monospace; font-size: 0.85rem; line-height: 1.5; }
 
     .result {
       padding: 1.5rem 1rem 3rem;
@@ -596,6 +593,23 @@ export class QuizResultComponent {
     this.visualChoices.set(
       current.includes(tag) ? current.filter(t => t !== tag) : [...current, tag]
     );
+  }
+
+  getPromptPreview(): string {
+    const res = this.result();
+    return `Crie uma ilustração de personagem de RPG com estilo semi-realista, proporções reais, sombreamento suave e acabamento de concept art.
+
+DADOS DO PERSONAGEM:
+- Classe: ${res.classe.nome} (${res.trilha.nome})
+- Origem: ${res.origem.nome}
+- Gênero/Aparência: ${this.genero()}
+- Etnia: ${this.etnia()}
+- Idade aparente: ${this.idade()}
+- Físico: ${this.altura()}, porte ${this.porte()}
+- Detalhes Visuais: ${this.visualChoices().join(', ') || 'Sem acessórios extras'}
+- Descrição da Classe: ${res.classe.descricao}
+
+Estilo final: concept art de RPG, estilo Ordem Paranormal, dark fantasy, pintura digital, paleta de cores cinematográfica e sombria, alta resolução, sem texto ou assinaturas.`;
   }
 
   copyPrompt() {
