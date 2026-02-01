@@ -5,8 +5,9 @@ import { QuizStepComponent } from './components/quiz-step/quiz-step.component';
 import { QuizResultComponent } from './components/quiz-result/quiz-result.component';
 import { QuizService } from './services/quiz.service';
 import { QuizOption, QuizResult } from './models/quiz.models';
+import { FichaAgenteComponent } from './components/ficha-agente/ficha-agente';
 
-type AppState = 'home' | 'quiz' | 'result';
+type AppState = 'home' | 'quiz' | 'result' | 'ficha';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,9 @@ type AppState = 'home' | 'quiz' | 'result';
     HeaderComponent,
     HomeComponent,
     QuizStepComponent,
-    QuizResultComponent
+    QuizResultComponent,
+    FichaAgenteComponent
+
   ],
   template: `
     <app-header />
@@ -44,6 +47,9 @@ type AppState = 'home' | 'quiz' | 'result';
             (restart)="restartQuiz()"
           />
         }
+        @case ('ficha') {
+          <app-ficha-agente />
+        }
       }
     </main>
   `,
@@ -57,7 +63,7 @@ type AppState = 'home' | 'quiz' | 'result';
 export class App {
   quizService = inject(QuizService);
 
-  appState = signal<AppState>('home');
+  appState = signal<AppState>('ficha');
   quizResult = signal<QuizResult | null>(null);
   isEntering = signal(false);
 
@@ -97,4 +103,10 @@ export class App {
     this.isEntering.set(false);
     setTimeout(() => this.isEntering.set(true), 10);
   }
+
+// 5. Crie a função para navegar até a ficha
+  irParaFicha(): void {
+    this.appState.set('ficha');
+  }
+
 }
