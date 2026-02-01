@@ -63,7 +63,7 @@ type AppState = 'home' | 'quiz' | 'result' | 'ficha';
 export class App {
   quizService = inject(QuizService);
 
-  appState = signal<AppState>('ficha');
+  appState = signal<AppState>('home');
   quizResult = signal<QuizResult | null>(null);
   isEntering = signal(false);
 
